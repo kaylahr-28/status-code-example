@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Our simple HTTP server</title>
   <style>
-    html, body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
     }
 
     #top {
-        text-align: center;
-        margin: 0 auto;
+      text-align: center;
+      margin: 0 auto;
     }
-    
+
     #top h1 {
       font-size: 2em;
     }
-    
+
     #content {
       margin-top: 100px;
       font-size: 2em;
@@ -32,15 +34,33 @@
       margin-block-end: 1em;
     }
   </style>
-  
+
   <script>
-    const handleResponse = (response) => {
+    const handleResponse = async (response) => {
+      const content = document.getElementById('content');
 
+      switch (response.status) {
+        case 200:
+          content.innerHTML = '<b>Success!!</b>';
+          break;
+        case 400:
+          content.innerHTML = '<b>Bad Request.</b>';
+          break;
+        case 404:
+          content.innerHTML = '<b>Not Found :{</b>';
+          break;
+        default:
+          content.innerHTML = '<b>Status code not implemented by client</b>';
+          break;
+      }
+
+      const resObj = await response.json();
+      content.innerHTML +=`<p>${resObj.message}</p>`
     };
-    
-    const sendFetch = (url) => {
 
-      //handleResponse(response);
+    const sendFetch = async (url) => {
+      const response = await fetch(url);
+      handleResponse(response);
     };
 
     const init = () => {
@@ -51,13 +71,14 @@
       successButton.addEventListener('click', () => sendFetch('/success'));
       badRequestButton.addEventListener('click', () => sendFetch('/badRequest'));
       notFoundButton.addEventListener('click', () => sendFetch('/notFound'));
-      
+
     };
 
     window.onload = init;
 
   </script>
 </head>
+
 <body>
   <section id="top">
     <h3>Status Code Tests</h3>
@@ -70,21 +91,22 @@
     <p>
       The following requests are simply placeholders so that we can talk about status codes.
     </p>
-  <hr>
+    <hr>
     <p>
-      Go to <b>/success</b> to test a <b>200 Success.</b> 
+      Go to <b>/success</b> to test a <b>200 Success.</b>
       <button id="success">Success</button>
     </p>
     <p>
-      Go to <b>/badRequest</b> to test a <b>400 Bad Request.</b> 
+      Go to <b>/badRequest</b> to test a <b>400 Bad Request.</b>
       <button id="badRequest">Bad Request</button>
     </p>
     <p>
-      Go to <b>any other URL</b> to test a <b>404 Not Found.</b> 
+      Go to <b>any other URL</b> to test a <b>404 Not Found.</b>
       <button id="notFound">Not Found</button>
     </p>
   </section>
   <section id="content">
   </section>
 </body>
+
 </html>
